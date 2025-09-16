@@ -1,28 +1,21 @@
+version: "3.8"
+
 services:
+  app:
+    build: ./backend
+    container_name: app
+    ports:
+      - "3000:3000"
+    depends_on:
+      - neo4j
+    network_mode: bridge
+
   neo4j:
-    image: neo4j:5.22.0-community
-    container_name: neo4j_db
-    restart: always
-    environment:
-      NEO4J_AUTH: "${NEO4J_USERNAME}/${NEO4J_PASSWORD}"
+    image: neo4j:5.25.1
+    container_name: neo4j
     ports:
       - "7474:7474"
       - "7687:7687"
-    volumes:
-      - neo4j_data:/data
-
-  backend:
-    build: ./backend
-    container_name: express_backend
-    restart: always
-    depends_on:
-      - neo4j
-    env_file:
-      - .env
-    ports:
-      - "${EXPRESS_PORT:-3000}:3000"
-
-volumes:
-  neo4j_data:
-    driver: local
-
+    environment:
+      - NEO4J_AUTH=neo4j/password
+    network_mode: bridge
